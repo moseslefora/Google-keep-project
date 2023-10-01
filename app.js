@@ -10,15 +10,13 @@ class Note {
 }
 class App {
   constructor() {
-    this.notes = [new Note("abk1", "Moses", "dijo")];
-
+    this.notes = [new Note("abc1", "Text", "Text message")];
     this.$activeForm = document.querySelector(".active-form");
     this.$inactiveForm = document.querySelector(".inactive-form");
     this.$noteTitle = document.querySelector("#note-title")
     this.$noteText = document.querySelector("#note-text")
     this.$notes = document.querySelector(".notes")
     this.$form = document.querySelector("#form");
-
 
     this.addEventListeners();
     this.displayNotes();
@@ -74,7 +72,7 @@ class App {
 
   addNote({title, text}) {
     if(text!= "") {
-      const newNote = new Note((cuid) ,title, text);
+      const newNote = new Note(cuid() ,title, text);
       this.notes = [...this.notes, newNote];
       this.displayNotes();
     }
@@ -93,29 +91,27 @@ class App {
     this.notes = this.notes.filter(note => note.id != id)
 
   }
-  handleMouseOvernote(element) {
-    console.log("MOUSE OVER", element.id)
-    // const $note = document.querySelector("#"+element.id);
-    // const $checkNote = $note.querySelector(".check-note");
-    // const $noteFooter = $note.querySelector(".note-footer");
-    // $checkNote.style.visibility = "visible"
-    // $noteFooter.style.visibility = "visible"
+  handleMouseOverNote(element) {
+    const $note = document.querySelector("#"+element.id);
+    const $checkNote = $note.querySelector(".check-circle");
+    const $noteFooter = $note.querySelector(".note-footer");
+    $checkNote.style.visibility = "visible";
+    $noteFooter.style.visibility = "visible";
+
   }
   handleMouseOutNote(element) {
-    console.log("MOUSE OUT", element.id)
-
-    // const $note = document.querySelector("#"+element.id);
-    // const $checkNote = $note.querySelector(".check-note");
-    // const $noteFooter = $note.querySelector(".note-footer");
-    // $checkNote.style.visibility = "hidden";
-    // $noteFooter.style.visibility = "hidden";
-
+    const $note = document.querySelector("#"+element.id);
+    const $checkNote = $note.querySelector(".check-circle");
+    const $noteFooter = $note.querySelector(".note-footer");
+    $checkNote.style.visibility = "hidden";
+    $noteFooter.style.visibility = "hidden";
   }
+
 
   displayNotes() {
     this.$notes.innerHTML = this.notes.map((note) => 
     `
-      <div class="note" id="${note.id}" onmouseover="app.handleMouseOverNote(this)" onmouseout="app.handleMouseOutNote(this)">
+      <div class="note" id="${note.id}" onmouseover="app.handleMouseOverNote(this)" onmouseout ="app.handleMouseOutNote(this)">
             <span class="material-icons check-circle">check_circle</span>
             <div class="title">${note.title}</div>
             <div class="text">${note.text}</div>
