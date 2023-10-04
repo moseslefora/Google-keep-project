@@ -11,12 +11,19 @@ class Note {
 class App {
   constructor() {
     this.notes = [new Note("abc1", "Text", "Text message")];
+    this.selectedNoteId  = ""
+
     this.$activeForm = document.querySelector(".active-form");
     this.$inactiveForm = document.querySelector(".inactive-form");
-    this.$noteTitle = document.querySelector("#note-title")
-    this.$noteText = document.querySelector("#note-text")
-    this.$notes = document.querySelector(".notes")
+    this.$noteTitle = document.querySelector("#note-title");
+    this.$noteText = document.querySelector("#note-text");
+    this.$notes = document.querySelector(".notes");
     this.$form = document.querySelector("#form");
+    this.$modal = document.querySelector(".modal");
+    this.$modalForm =document.querySelector("#modal-form");
+    this.$modalTitle = document.querySelector("#modal-title");
+    this.$modalText = document.querySelector("#modal-text");
+    this.$closeModalForm = document.querySelector("#modal-btn");
 
     this.addEventListeners();
     this.displayNotes();
@@ -24,7 +31,10 @@ class App {
 
   addEventListeners() {
     document.body.addEventListener("click", (event) => {
-      this.handleFormClick(event);
+      this.handleFormClick(event)
+      this.closeModal(event)
+      this.openModal(event)
+      this.handleArchiving(event)
     })
 
     this.$form.addEventListener("submit", (event) =>  {
@@ -33,7 +43,9 @@ class App {
       const text = this.$noteText.value;
       this.addNote({ title, text});
       this.closeActiveForm();
-
+    })
+    this.$closeModalForm.addEventListener("click", (event) =>  {
+      event.preventDefault();
     })
 
   }
@@ -51,8 +63,8 @@ class App {
     else if(!isActiveFormClickedOn && !isActiveFormClickedOn) {
       this.addNote({ title, text});
       this.closeActiveForm();
-
     }
+
   }
 
   openActiveForm() {
@@ -69,6 +81,36 @@ class App {
     this.$noteText.value = "";
   }
 
+  openModal(event) {
+    const $selectNote =event.target.closest(".note")
+    if($selectNote  && !event.target.closest(".archive")) {
+      this.selectedNoteId = $selectNote.id;
+      this.$modalTitle.value = $selectNote.children[1].innerHTML;
+      this.$modalText.value = $selectNote.children[2].innerHTML;  
+      this.$modal.classList.add("open-modal");
+    }else {
+      return;
+    }
+  }
+  closeModal(event) {
+    const isModalFormClickedOn =this.$modalForm.contains(event.target);
+    const isModalFormBtnClickedOn = this.$modalForm.contains(event.target);
+    if((!isModalFormClickedOn || isModalFormBtnClickedOn) && this.$modal.classList.contains("open-modal")) {
+      this.editNote(this.selectedNoteId, {title: this.$modalTitle.value, text: this.$modalText.value})
+      this.$modal.classList.remove("open-modal");
+    }
+  }
+
+  handleArchiving(event) {
+    const $selectNote =event.target.closest(".note")
+    if($selectNote && event.target.closest(".archive")) {
+      this.selectedNoteId = $selectNote.id;
+      this.deletNote(this.selectedNoteId)
+    }else {
+      return;
+    }
+  }
+
 
   addNote({title, text}) {
     if(text!= "") {
@@ -76,8 +118,8 @@ class App {
       this.notes = [...this.notes, newNote];
       this.displayNotes();
     }
-
   }
+
   editNote(id, {title, text}) {  
     this.notes.map(note => {
       if(note.id == id) {
@@ -86,9 +128,12 @@ class App {
       }
       return note;
     })
+    this.displayNotes();
+
   }
   deletNote(id) {
     this.notes = this.notes.filter(note => note.id != id)
+    this.displayNotes();
 
   }
   handleMouseOverNote(element) {
@@ -106,12 +151,14 @@ class App {
     $checkNote.style.visibility = "hidden";
     $noteFooter.style.visibility = "hidden";
   }
+  //  ============         ================
+  // onmouseover="app.handleMouseOverNote(this)" onmouseout ="app.handleMouseOutNote(this)"
 
 
   displayNotes() {
     this.$notes.innerHTML = this.notes.map((note) => 
     `
-      <div class="note" id="${note.id}" onmouseover="app.handleMouseOverNote(this)" onmouseout ="app.handleMouseOutNote(this)">
+      <div class="note" id="${note.id}"onmouseover="app.handleMouseOverNote(this)" onmouseout ="app.handleMouseOutNote(this)">
             <span class="material-icons check-circle">check_circle</span>
             <div class="title">${note.title}</div>
             <div class="text">${note.text}</div>
